@@ -9,6 +9,16 @@ from parser import parser_it52, parser_ict2go, parser_networkly
 # locale.setlocale(locale.LC_TIME, 'ru_RU.UTF-8')  # для Linux/macOS
 locale.setlocale(locale.LC_TIME, 'Russian_Russia.1251')  # для Windows
 
+MONTHS_RU = {
+    "января": 1, "февраля": 2, "марта": 3, "апреля": 4,
+    "мая": 5, "июня": 6, "июля": 7, "августа": 8,
+    "сентября": 9, "октября": 10, "ноября": 11, "декабря": 12,
+    "январь": 1, "февраль": 2, "март": 3, "апрель": 4,
+    "май": 5, "июнь": 6, "июль": 7, "август": 8,
+    "сентябрь": 9, "октябрь": 10, "ноябрь": 11, "декабрь": 12
+}
+MONTHS_RU_REVERSE = {v: k for k, v in MONTHS_RU.items()}
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
