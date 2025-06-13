@@ -53,6 +53,45 @@ def save_to_mongo(events):
             logger.error(f"Ошибка сохранения: {e}")
     return new_count
 
+def parse_normalized_date(date_str):
+    if not date_str:
+        return None
+
+    date_str = date_str.lower().strip()
+    patterns = [
+        (r"(\d{1,2})\s+([а-яё]+)\s+(\d{4})", "%d %B %Y"),
+        (r"(\d{2})\.(\d{2})\.(\d{4})", "%d.%m.%Y"),
+        (r"(\d{1,2})\s+([а-яё]+)", "%d %B"),
+    ]
+
+    for pattern, date_format in patterns:
+        match = re.search(pattern, date_str)
+        if match:
+            try:
+                date_str = date_str.replace(match.group(0), "").strip()
+                if "%B" in date_format:
+                    day = int(match.group(1))
+                    month = MONTHS_RU.get(match.group(2))
+                    year = int(match.group(3)) if len(match.groups()) > 2 else datetime.now().year
+                    if month:
+                        return datetime(year, month, day)
+                else:
+                    if date_format.count("%") == len(match.groups()):
+                        date_str = match.group(0)
+                        return datetime.strptime(date_str, date_format)
+            except (ValueError, IndexError):
+                continue
+
+    today = datetime.now()
+    if "сегодня" in date_str:
+        return today.replace(hour=0, minute=0, second=0, microsecond=0)
+    elif "послезавтра" in date_str:
+        return (today + timedelta(days=2)).replace(hour=0, minute=0, second=0, microsecond=0)
+    elif "завтра" in date_str:
+        return (today + timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
+
+    return None
+
 @app.route("/")
 def index():
     try:
