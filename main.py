@@ -17,7 +17,31 @@ MONTHS_RU = {
     "май": 5, "июнь": 6, "июль": 7, "август": 8,
     "сентябрь": 9, "октябрь": 10, "ноябрь": 11, "декабрь": 12
 }
-MONTHS_RU_REVERSE = {v: k for k, v in MONTHS_RU.items()}
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(name)
+
+app = Flask(name)
+
+def init_mongo():
+    try:
+        client = MongoClient(
+            "mongodb://localhost:27017/",
+            serverSelectionTimeoutMS=5000,
+            socketTimeoutMS=30000,
+            connectTimeoutMS=30000
+        )
+        client.server_info()
+        db = client["events_db"]
+        collection = db["nnov_it_events"]
+        logger.info("✅ MongoDB успешно подключен")
+        return collection
+    except Exception as e:
+        logger.error(f"❌ Ошибка подключения к MongoDB: {e}")
+        return None
+
+
+collection = init_mongo()
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
