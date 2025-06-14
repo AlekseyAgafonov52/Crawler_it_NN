@@ -252,6 +252,15 @@
         <a href="/update" class="update-btn">Обновить данные</a>
     </form>
 
+    {% if keyword or date_filter %}
+    <div class="filters-info">
+        Применены фильтры:
+        {% if keyword %}<strong>Поиск: "{{ keyword }}"</strong>{% endif %}
+        {% if date_filter %}<strong>Дата: {{ date_filter }}</strong>{% endif %}
+        <a href="/" class="clear-filters">Сбросить фильтры</a>
+    </div>
+    {% endif %}
+
     <div class="event-list">
         {% if events %}
             {% for event in events %}
@@ -266,7 +275,16 @@
                 </div>
 
                 <div class="event-description">
-                    
+                    {% if event.full_description %}
+                        <div class="short-description">
+                            {{ event.short_description }}
+                            <span class="read-more" onclick="toggleDescription(this)">Подробнее</span>
+                        </div>
+                        <div class="full-description">
+                            {{ event.full_description|safe }}
+                            <span class="read-more" onclick="toggleDescription(this)">Свернуть</span>
+                        </div>
+                    {% endif %}
                 </div>
 
                 <div class="event-source">
@@ -285,9 +303,60 @@
         {% endif %}
     </div>
 
+    <div class="scroll-to-top" id="scrollToTop"></div>
+
     <footer>
         © {{ current_year }} IT мероприятия в Нижнем Новгороде
     </footer>
 
+    <script>
+        function toggleDescription(element) {
+            const container = element.closest('.event-description');
+            const shortDesc = container.querySelector('.short-description');
+            const fullDesc = container.querySelector('.full-description');
+
+            if (fullDesc.style.display === 'none' || !fullDesc.style.display) {
+                shortDesc.style.display = 'none';
+                fullDesc.style.display = 'block';
+            } else {
+                fullDesc.style.display = 'none';
+                shortDesc.style.display = 'block';
+            }
+        }
+
+        // Подсветка результатов поиска
+        document.addEventListener('DOMContentLoaded', function() {
+            const keyword = "{{ keyword }}";
+            if (keyword) {
+                const regex = new RegExp(keyword, 'gi');
+                const cards = document.querySelectorAll('.event-card');
+
+                cards.forEach(card => {
+                    const text = card.textContent;
+                    if (regex.test(text)) {
+                        card.style.borderLeft = '4px solid #3498db';
+                    }
+                });
+            }
+        });
+
+        // Показываем/скрываем кнопку при прокрутке
+        window.onscroll = function() {
+            var scrollToTopBtn = document.getElementById("scrollToTop");
+            if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
+                scrollToTopBtn.style.display = "block";
+            } else {
+                scrollToTopBtn.style.display = "none";
+            }
+        };
+
+        // Плавная прокрутка вверх при клике
+        document.getElementById('scrollToTop').addEventListener('click', function() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    </script>
 </body>
 </html>
