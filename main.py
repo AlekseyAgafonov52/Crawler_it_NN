@@ -21,7 +21,7 @@ MONTHS_RU = {
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(name)
 
-app = Flask(name)
+app = Flask(__name__)
 
 def init_mongo():
     try:
@@ -40,13 +40,7 @@ def init_mongo():
         logger.error(f"❌ Ошибка подключения к MongoDB: {e}")
         return None
 
-
 collection = init_mongo()
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-app = Flask(__name__)
 
 def clean_html(html):
     """Очистка HTML от потенциально опасных тегов"""
@@ -172,6 +166,10 @@ def index():
     except Exception as e:
         logger.error(f"Ошибка загрузки: {e}")
         return render_template("error.html", message="Ошибка загрузки данных")
+
+@app.route('/static/background.jpg')
+def serve_background():
+    return send_from_directory('static', 'background.jpg')
 
 @app.route("/update")
 def update():
