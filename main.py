@@ -19,7 +19,7 @@ MONTHS_RU = {
 }
 
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(name)
+logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 
